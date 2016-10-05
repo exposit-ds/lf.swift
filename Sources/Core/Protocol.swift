@@ -1,4 +1,5 @@
 import Foundation
+import AVFoundation
 
 protocol BytesConvertible {
     var bytes:[UInt8] { get set }
@@ -18,3 +19,7 @@ protocol Iterator {
     func next() -> T?
 }
 
+protocol AdditionalOutput {
+    func addOutput(output: AVCaptureOutput!)
+    func removeOutput(output: AVCaptureOutput!)
+}

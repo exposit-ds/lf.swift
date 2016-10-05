@@ -143,3 +143,21 @@ extension AVMixer: Runnable {
     }
 }
 #endif
+
+extension AVMixer: AdditionalOutput {
+    
+    func addOutput(output: AVCaptureOutput!) {
+
+        if session.canAddOutput(output) {
+            session.beginConfiguration()
+            session.addOutput(output)
+            session.commitConfiguration()
+        }
+    }
+    
+    func removeOutput(output: AVCaptureOutput!) {
+        session.beginConfiguration()
+        session.removeOutput(output)
+        session.commitConfiguration()
+    }
+}
