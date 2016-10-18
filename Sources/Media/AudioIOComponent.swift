@@ -7,33 +7,30 @@ final class AudioIOComponent: IOComponent {
     let lockQueue:DispatchQueue = DispatchQueue(label: "com.haishinkit.HaishinKit.AudioIOComponent.lock")
 
 #if os(iOS) || os(macOS)
-    var input:AVCaptureDeviceInput? = nil {
+    var input:LFCaptureDeviceInput? = nil {
         didSet {
             guard let mixer:AVMixer = mixer, oldValue != input else {
                 return
             }
-            if let oldValue:AVCaptureDeviceInput = oldValue {
-                mixer.session.removeInput(oldValue)
+            if let oldValue:LFCaptureDeviceInput = oldValue {
+                mixer.session?.removeInput(oldValue)
             }
-            if let input:AVCaptureDeviceInput = input, mixer.session.canAddInput(input) {
+            if let input:LFCaptureDeviceInput = input, mixer.session.canAddInput(input) {
                 mixer.session.addInput(input)
             }
         }
     }
 
-    private var _output:AVCaptureAudioDataOutput? = nil
-    var output:AVCaptureAudioDataOutput! {
+    private var _output:LFCaptureAudioDataOutput? = nil
+    var output:LFCaptureAudioDataOutput? {
         get {
-            if (_output == nil) {
-                _output = AVCaptureAudioDataOutput()
-            }
             return _output
         }
         set {
-            if (_output == newValue) {
+            if (_output === newValue) {
                 return
             }
-            if let output:AVCaptureAudioDataOutput = _output {
+            if let output:LFCaptureAudioDataOutput = _output {
                 output.setSampleBufferDelegate(nil, queue: nil)
                 mixer?.session.removeOutput(output)
             }
@@ -48,7 +45,7 @@ final class AudioIOComponent: IOComponent {
     }
 
 #if os(iOS) || os(macOS)
-    func attachAudio(_ audio:AVCaptureDevice?, automaticallyConfiguresApplicationAudioSession:Bool) throws {
+    func attachAudio(_ audio:LFCaptureDevice?, automaticallyConfiguresApplicationAudioSession:Bool) throws {
         guard let mixer:AVMixer = mixer else {
             return
         }
@@ -61,12 +58,12 @@ final class AudioIOComponent: IOComponent {
         output = nil
         encoder.invalidate()
 
-        guard let audio:AVCaptureDevice = audio else {
+        guard let audio:LFCaptureDevice = audio else {
             input = nil
             return
         }
 
-        input = try AVCaptureDeviceInput(device: audio)
+        input = try audio.createCaptureDeviceInput()
         #if os(iOS)
         mixer.session.automaticallyConfiguresApplicationAudioSession = automaticallyConfiguresApplicationAudioSession
         #endif

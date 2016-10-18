@@ -23,7 +23,7 @@ final class VideoIOComponent: IOComponent {
     var fps:Float64 = AVMixer.defaultFPS {
         didSet {
             guard
-                let device:AVCaptureDevice = (input as? AVCaptureDeviceInput)?.device,
+                let device:LFCaptureDevice = (input as? LFCaptureDeviceInput)?.device,
                 let data = DeviceUtil.getActualFPS(fps, device: device) else {
                 return
             }
@@ -47,6 +47,7 @@ final class VideoIOComponent: IOComponent {
 
     var videoSettings:[NSObject:AnyObject] = AVMixer.defaultVideoSettings {
         didSet {
+            guard let output = output else { return }
             output.videoSettings = videoSettings
         }
     }
@@ -85,7 +86,7 @@ final class VideoIOComponent: IOComponent {
                 return
             }
             let focusMode:AVCaptureFocusMode = continuousAutofocus ? .continuousAutoFocus : .autoFocus
-            guard let device:AVCaptureDevice = (input as? AVCaptureDeviceInput)?.device,
+            guard let device:LFCaptureDevice = (input as? LFCaptureDeviceInput)?.device,
                 device.isFocusModeSupported(focusMode) else {
                 logger.warning("focusMode(\(focusMode.rawValue)) is not supported")
                 return
@@ -104,7 +105,7 @@ final class VideoIOComponent: IOComponent {
     var focusPointOfInterest:CGPoint? {
         didSet {
             guard
-                let device:AVCaptureDevice = (input as? AVCaptureDeviceInput)?.device,
+                let device:LFCaptureDevice = (input as? LFCaptureDeviceInput)?.device,
                 let point:CGPoint = focusPointOfInterest,
                 device.isFocusPointOfInterestSupported else {
                 return
@@ -123,7 +124,7 @@ final class VideoIOComponent: IOComponent {
     var exposurePointOfInterest:CGPoint? {
         didSet {
             guard
-                let device:AVCaptureDevice = (input as? AVCaptureDeviceInput)?.device,
+                let device:LFCaptureDevice = (input as? LFCaptureDeviceInput)?.device,
                 let point:CGPoint = exposurePointOfInterest,
                 device.isExposurePointOfInterestSupported else {
                 return
@@ -145,7 +146,7 @@ final class VideoIOComponent: IOComponent {
                 return
             }
             let exposureMode:AVCaptureExposureMode = continuousExposure ? .continuousAutoExposure : .autoExpose
-            guard let device:AVCaptureDevice = (input as? AVCaptureDeviceInput)?.device,
+            guard let device:LFCaptureDevice = (input as? LFCaptureDeviceInput)?.device,
                 device.isExposureModeSupported(exposureMode) else {
                 logger.warning("exposureMode(\(exposureMode.rawValue)) is not supported")
                 return
@@ -160,21 +161,18 @@ final class VideoIOComponent: IOComponent {
         }
     }
 
-    fileprivate var _output:AVCaptureVideoDataOutput? = nil
-    var output:AVCaptureVideoDataOutput! {
+    fileprivate var _output:LFCaptureVideoDataOutput? = nil
+    var output:LFCaptureVideoDataOutput? {
         get {
-            if (_output == nil) {
-                _output = AVCaptureVideoDataOutput()
-                _output!.alwaysDiscardsLateVideoFrames = true
-                _output!.videoSettings = videoSettings
-            }
-            return _output!
+            _output?.alwaysDiscardsLateVideoFrames = true
+            _output?.videoSettings = videoSettings
+            return _output
         }
         set {
-            if (_output == newValue) {
+            if (_output === newValue) {
                 return
             }
-            if let output:AVCaptureVideoDataOutput = _output {
+            if let output:LFCaptureVideoDataOutput = _output {
                 output.setSampleBufferDelegate(nil, queue: nil)
                 mixer?.session.removeOutput(output)
             }
@@ -182,15 +180,15 @@ final class VideoIOComponent: IOComponent {
         }
     }
 
-    var input:AVCaptureInput? = nil {
+    var input:LFCaptureInput? = nil {
         didSet {
             guard let mixer:AVMixer = mixer, oldValue != input else {
                 return
             }
-            if let oldValue:AVCaptureInput = oldValue {
-                mixer.session.removeInput(oldValue)
+            if let oldValue:LFCaptureInput = oldValue {
+                mixer.session?.removeInput(oldValue)
             }
-            if let input:AVCaptureInput = input, mixer.session.canAddInput(input) {
+            if let input:LFCaptureInput = input, mixer.session.canAddInput(input) {
                 mixer.session.addInput(input)
             }
         }
@@ -225,7 +223,7 @@ final class VideoIOComponent: IOComponent {
     }
 
 #if os(iOS) || os(macOS)
-    func attachCamera(_ camera:AVCaptureDevice?) throws {
+    func attachCamera(_ camera:LFCaptureDevice?) throws {
         guard let mixer:AVMixer = mixer else {
             return
         }
@@ -239,15 +237,16 @@ final class VideoIOComponent: IOComponent {
         }
 
         output = nil
-        guard let camera:AVCaptureDevice = camera else {
+        guard let camera:LFCaptureDevice = camera else {
             input = nil
             return
         }
+        output = camera.createCaptureVideoDataOutput()
         #if os(iOS)
         screen = nil
         #endif
 
-        input = try AVCaptureDeviceInput(device: camera)
+        input = try camera.createCaptureDeviceInput()
         mixer.session.addOutput(output)
         for connection in output.connections {
             guard let connection:AVCaptureConnection = connection as? AVCaptureConnection else {
@@ -265,7 +264,7 @@ final class VideoIOComponent: IOComponent {
     }
 
     func setTorchMode(_ torchMode:AVCaptureTorchMode) {
-        guard let device:AVCaptureDevice = (input as? AVCaptureDeviceInput)?.device, device.isTorchModeSupported(torchMode) else {
+        guard let device:LFCaptureDevice = (input as? LFCaptureDeviceInput)?.device, device.isTorchModeSupported(torchMode) else {
             logger.warning("torchMode(\(torchMode)) is not supported")
             return
         }

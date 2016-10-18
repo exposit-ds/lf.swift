@@ -5,10 +5,13 @@ import AVFoundation
 public final class DeviceUtil {
     private init() {
     }
+    
+    static public weak var delegate: LFDelegate? = nil
 
-    static public func device(withPosition:AVCaptureDevicePosition) -> AVCaptureDevice? {
-        for device in AVCaptureDevice.devices() {
-            guard let device:AVCaptureDevice = device as? AVCaptureDevice else {
+    static public func device(withPosition:AVCaptureDevicePosition) -> LFCaptureDevice? {
+        guard let delegate = delegate else { return nil }
+        for device in delegate.getDevices() {
+            guard let device:LFCaptureDevice = device as? LFCaptureDevice else {
                 continue
             }
             if (device.hasMediaType(AVMediaTypeVideo) && device.position == withPosition) {
@@ -18,9 +21,10 @@ public final class DeviceUtil {
         return nil
     }
 
-    static public func device(withLocalizedName:String, mediaType:String) -> AVCaptureDevice? {
-        for device in AVCaptureDevice.devices() {
-            guard let device:AVCaptureDevice = device as? AVCaptureDevice else {
+    static public func device(withLocalizedName:String, mediaType:String) -> LFCaptureDevice? {
+        guard let delegate = self.delegate else { return nil }
+        for device in delegate.getDevices() {
+            guard let device:LFCaptureDevice = device as? LFCaptureDevice else {
                 continue
             }
             if (device.hasMediaType(mediaType) && device.localizedName == withLocalizedName) {
@@ -30,11 +34,11 @@ public final class DeviceUtil {
         return nil
     }
 
-    static func getActualFPS(_ fps:Float64, device:AVCaptureDevice) -> (fps:Float64, duration:CMTime)? {
+    static func getActualFPS(_ fps:Float64, device:LFCaptureDevice) -> (fps:Float64, duration:CMTime)? {
         var durations:[CMTime] = []
         var frameRates:[Float64] = []
 
-        for object:Any in device.activeFormat.videoSupportedFrameRateRanges {
+        for object:Any in device.videoSupportedFrameRateRanges {
             guard let range:AVFrameRateRange = object as? AVFrameRateRange else {
                 continue
             }

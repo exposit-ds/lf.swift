@@ -11,6 +11,7 @@ final public class AVMixer: NSObject {
     ]
 
     static let defaultFPS:Float64 = 30
+
     static let defaultVideoSettings:[NSString: AnyObject] = [
         kCVPixelBufferPixelFormatTypeKey: NSNumber(value: kCVPixelFormatType_32BGRA)
     ]
@@ -37,17 +38,17 @@ final public class AVMixer: NSObject {
             guard sessionPreset != oldValue else {
                 return
             }
-            session.beginConfiguration()
-            session.sessionPreset = sessionPreset
-            session.commitConfiguration()
+            session?.beginConfiguration()
+            session?.sessionPreset = sessionPreset
+            session?.commitConfiguration()
         }
     }
 
-    fileprivate var _session:AVCaptureSession?
-    public var session:AVCaptureSession {
+    fileprivate var _session:LFCaptureSession?
+    public var session:LFCaptureSession {
         get {
             if (_session == nil) {
-                _session = AVCaptureSession()
+                _session = DeviceUtil.delegate!.createCaptureSession()
                 _session!.sessionPreset = AVMixer.defaultSessionPreset
             }
             return _session!
@@ -112,7 +113,7 @@ extension AVMixer {
 extension AVMixer: Runnable {
     // MARK: Runnable
     var running:Bool {
-        return session.isRunning
+        return session != nil && session!.isRunning
     }
 
     final func startRunning() {

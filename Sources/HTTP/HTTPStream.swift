@@ -45,14 +45,3 @@ open class HTTPStream: NetStream {
         }
     }
 }
-
-extension HTTPStream: AdditionalOutput {
-    
-    public func addOutput(output: AVCaptureOutput!) {
-        self.mixer.addOutput(output: output)
-    }
-    
-    public func removeOutput(output: AVCaptureOutput!) {
-        self.mixer.removeOutput(output: output)
-    }
-}
