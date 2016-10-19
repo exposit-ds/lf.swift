@@ -57,7 +57,7 @@ class TSWriter {
 
     func writeSampleBuffer(_ PID:UInt16, streamID:UInt8, sampleBuffer:CMSampleBuffer) {
         let presentationTimeStamp:CMTime = sampleBuffer.presentationTimeStamp
-        if (timestamps[PID] == nil) {
+        if (timestamps[PID] == nil || presentationTimeStamp < timestamps[PID]!) {
             timestamps[PID] = presentationTimeStamp
             if (PCRPID == PID) {
                 PCRTimestamp = presentationTimeStamp
