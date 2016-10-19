@@ -28,6 +28,8 @@ open class GLLFView: NSOpenGLView {
     fileprivate var originalFrame:CGRect = CGRect.zero
     fileprivate var scale:CGRect = CGRect.zero
     fileprivate weak var currentStream:NetStream?
+    
+    private var previousVideoRect: CGRect = CGRect.zero
 
     open override func prepareOpenGL() {
         if let openGLContext:NSOpenGLContext = openGLContext {
@@ -74,7 +76,8 @@ open class GLLFView: NSOpenGLView {
 
         glContext.makeCurrentContext()
         
-        if self.inLiveResize {
+        if previousVideoRect != inRect {
+            previousVideoRect = inRect
             glClear(GLenum(GL_COLOR_BUFFER_BIT))
         }
         
