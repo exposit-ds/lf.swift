@@ -73,7 +73,11 @@ open class GLLFView: NSOpenGLView {
         inRect.size.height = inRect.size.height * scale.size.height
 
         glContext.makeCurrentContext()
-        glClear(GLenum(GL_COLOR_BUFFER_BIT))
+        
+        if self.inLiveResize {
+            glClear(GLenum(GL_COLOR_BUFFER_BIT))
+        }
+        
         ciContext.draw(image, in: inRect.integral, from: fromRect)
 
         glFlush()
