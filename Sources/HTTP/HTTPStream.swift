@@ -3,6 +3,7 @@ import AVFoundation
 
 open class HTTPStream: NetStream {
     private(set) var name:String?
+    open private(set) var uniqueID: String = UUID.init().uuidString
     private lazy var tsWriter:TSWriter = TSWriter()
 
     open func publish(_ name:String?) {
@@ -28,7 +29,7 @@ open class HTTPStream: NetStream {
 
     func getResource(_ resourceName:String) -> (MIME, String)? {
         let url:URL = URL(fileURLWithPath: resourceName)
-        guard let name:String = name, 2 <= url.pathComponents.count && url.pathComponents[1] == name else {
+        guard 2 <= url.pathComponents.count && url.pathComponents[1] == uniqueID else {
             return nil
         }
         let fileName:String = url.pathComponents.last!
