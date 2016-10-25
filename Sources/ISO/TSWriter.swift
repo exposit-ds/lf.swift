@@ -213,6 +213,7 @@ extension TSWriter: Runnable {
             self.currentFileURL = nil
             self.currentFileHandle = nil
             self.removeFiles()
+            self.rotatedTimestamp = kCMTimeZero
             self.running = false
         }
     }

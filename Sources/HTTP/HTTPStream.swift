@@ -18,6 +18,7 @@ open class HTTPStream: NetStream {
                 return
             }
             self.name = name
+            self.uniqueID = UUID.init().uuidString
             #if os(iOS)
             self.mixer.videoIO.screen?.startRunning()
             #endif
