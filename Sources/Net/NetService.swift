@@ -16,7 +16,6 @@ open class NetService: NSObject {
     fileprivate(set) var running:Bool = false
     fileprivate(set) var clients:[NetClient] = []
     fileprivate(set) var service:Foundation.NetService!
-    fileprivate var runloop:RunLoop!
 
     public init(domain:String, type:String, name:String, port:Int32) {
         self.domain = domain
@@ -43,18 +42,12 @@ open class NetService: NSObject {
     }
 
     func willStopRunning() {
-        if let runloop:RunLoop = runloop {
-            service.remove(from: runloop, forMode: RunLoopMode.defaultRunLoopMode)
-            CFRunLoopStop(runloop.getCFRunLoop())
-        }
         service.stop()
         service.delegate = nil
         service = nil
-        runloop = nil
     }
 
     fileprivate func initService() {
-        runloop = RunLoop.current
         service = Foundation.NetService(domain: domain, type: type, name: name, port: port)
         service.delegate = self
         service.setTXTRecord(txtData)
@@ -64,7 +57,6 @@ open class NetService: NSObject {
         } else {
             service.publish(options: Foundation.NetService.Options.listenForConnections)
         }
-        runloop.run()
     }
 }
 

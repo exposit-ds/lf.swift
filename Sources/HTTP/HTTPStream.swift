@@ -4,6 +4,7 @@ import AVFoundation
 open class HTTPStream: NetStream {
     private(set) var name:String?
     open private(set) var uniqueID: String = UUID.init().uuidString
+
     private lazy var tsWriter:TSWriter = TSWriter()
 
     open func publish(_ name:String?) {

@@ -38,3 +38,18 @@ extension HTTPStream: AdditionalOutput {
         self.mixer.removeOutput(output: output)
     }
 }
+
+protocol TSWriterDelegate: class {
+    func tsWriterReady(tsWriter: TSWriter)
+}
+
+public protocol HTTPStreamDelegate: class {
+    func httpStreamReady(httpStream: HTTPStream)
+}
+
+extension HTTPStream: TSWriterDelegate {
+    
+    func tsWriterReady(tsWriter: TSWriter) {
+        delegate?.httpStreamReady(httpStream: self)
+    }
+}

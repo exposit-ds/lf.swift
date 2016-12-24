@@ -21,11 +21,13 @@ class TSWriter {
         let startIndex = max(0, files.count - TSWriter.defaultSegmentCount)
         m3u8.mediaSequence = sequence - TSWriter.defaultSegmentMaxCount
         m3u8.mediaList = Array(files[startIndex..<files.count])
+        m3u8.mediaSequence = sequence >= m3u8.mediaList.count ? sequence - m3u8.mediaList.count : 0
         return m3u8.description
     }
     var lockQueue:DispatchQueue = DispatchQueue(label: "com.haishinkit.HaishinKit.TSWriter.lock")
     var segmentMaxCount:Int = TSWriter.defaultSegmentMaxCount
     var segmentDuration:Double = TSWriter.defaultSegmentDuration
+    weak var delegate: TSWriterDelegate? = nil
 
     fileprivate(set) var PAT:ProgramAssociationSpecific = {
         let PAT:ProgramAssociationSpecific = ProgramAssociationSpecific()
@@ -36,7 +38,13 @@ class TSWriter {
     fileprivate(set) var files:[M3UMediaInfo] = []
     fileprivate(set) var running:Bool = false
     fileprivate var PCRPID:UInt16 = TSWriter.defaultVideoPID
-    fileprivate var sequence:Int = 0
+    fileprivate var sequence:Int = 0 {
+        didSet {
+            if sequence > 0 && oldValue == 0 {
+                delegate?.tsWriterReady(tsWriter: self)
+            }
+        }
+    }
     fileprivate var timestamps:[UInt16:CMTime] = [:]
     fileprivate var audioConfig:AudioSpecificConfig?
     fileprivate var videoConfig:AVCConfigurationRecord?
@@ -199,7 +207,7 @@ extension TSWriter: Runnable {
     // MARK: Runnable
     func startRunning() {
         lockQueue.async {
-            guard self.running else {
+            if (self.running) {
                 return
             }
             self.running = true
@@ -207,13 +215,14 @@ extension TSWriter: Runnable {
     }
     func stopRunning() {
         lockQueue.async {
-            guard !self.running else {
+            if (!self.running) {
                 return
             }
             self.currentFileURL = nil
             self.currentFileHandle = nil
             self.removeFiles()
             self.rotatedTimestamp = kCMTimeZero
+            self.sequence = 0
             self.running = false
         }
     }

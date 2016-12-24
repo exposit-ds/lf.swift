@@ -31,7 +31,12 @@ extension M3U: CustomStringConvertible {
 }
 
 // MARK: -
-struct M3UMediaInfo {
-    var url:URL
-    var duration:Double
+public struct M3UMediaInfo {
+    public var url:URL
+    public var duration:Double
+    
+    public init(url: URL, duration: Double) {
+        self.url = url
+        self.duration = duration
+    }
 }
