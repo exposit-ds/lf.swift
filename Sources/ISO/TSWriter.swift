@@ -223,6 +223,12 @@ extension TSWriter: Runnable {
             self.removeFiles()
             self.rotatedTimestamp = kCMTimeZero
             self.sequence = 0
+            self.PMT = ProgramMapSpecific()
+            self.timestamps = [:]
+            self.audioConfig = nil
+            self.videoConfig = nil
+            self.PCRTimestamp = kCMTimeZero
+            self.continuityCounters = [:]
             self.running = false
         }
     }

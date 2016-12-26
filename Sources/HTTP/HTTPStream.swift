@@ -16,6 +16,7 @@ open class HTTPStream: NetStream {
                 #endif
                 self.mixer.stopEncoding()
                 self.tsWriter.stopRunning()
+                self.tsWriter.delegate = nil
                 return
             }
             self.name = name
