@@ -27,6 +27,8 @@ protocol AdditionalOutput {
 public protocol LFCaptureDevice: class {
     var localizedName: String { get }
     var uniqueID: String { get }
+    var videoWidth: Int { get }
+    var videoHeight: Int { get }
     var position:AVCaptureDevicePosition { get }
     var torchMode: AVCaptureTorchMode { get set }
     var focusMode: AVCaptureFocusMode { get set }
