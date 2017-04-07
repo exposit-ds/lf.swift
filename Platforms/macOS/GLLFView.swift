@@ -23,7 +23,7 @@ open class GLLFView: NSOpenGLView {
     public var videoGravity:String! = AVLayerVideoGravityResizeAspect
     var orientation:AVCaptureVideoOrientation = .portrait
     var position:AVCaptureDevicePosition = .front
-    fileprivate var displayImage:CIImage!
+    fileprivate var displayImage:CIImage? = nil
     fileprivate var ciContext:CIContext!
     fileprivate var originalFrame:CGRect = CGRect.zero
     fileprivate var scale:CGRect = CGRect.zero
@@ -59,12 +59,16 @@ open class GLLFView: NSOpenGLView {
     }
 
     open override func draw(_ dirtyRect: NSRect) {
-        guard
-            let image:CIImage = displayImage,
-            let glContext:NSOpenGLContext = openGLContext else {
+        guard let glContext:NSOpenGLContext = openGLContext else {
             return
         }
-
+        
+        guard let image:CIImage = displayImage else {
+            glClear(GLenum(GL_COLOR_BUFFER_BIT))
+            glFlush()
+            return
+        }
+        
         var inRect:CGRect = dirtyRect
         var fromRect:CGRect = image.extent
         VideoGravityUtil.calclute(videoGravity, inRect: &inRect, fromRect: &fromRect)
@@ -108,6 +112,11 @@ open class GLLFView: NSOpenGLView {
             }
         }
         currentStream = stream
+    }
+    
+    open func clear() {
+        displayImage = nil
+        needsDisplay = true
     }
 }
 
