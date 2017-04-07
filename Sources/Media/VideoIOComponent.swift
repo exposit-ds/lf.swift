@@ -341,8 +341,11 @@ extension VideoIOComponent: AVCaptureVideoDataOutputSampleBufferDelegate {
             presentationTimeStamp: sampleBuffer.presentationTimeStamp,
             duration: sampleBuffer.duration
         )
-        drawable?.draw(image: image)
-        mixer?.recorder.appendSampleBuffer(sampleBuffer, mediaType: AVMediaTypeVideo)
+
+        if input != nil {
+            drawable?.draw(image: image)
+            mixer?.recorder.appendSampleBuffer(sampleBuffer, mediaType: AVMediaTypeVideo)
+        }
     }
 }
 
@@ -356,7 +359,9 @@ extension VideoIOComponent: VideoDecoderDelegate {
 extension VideoIOComponent: ClockedQueueDelegate {
     // MARK: ClockedQueueDelegate
     func queue(_ buffer: CMSampleBuffer) {
-        mixer?.audioIO.playback.startQueueIfNeed()
-        drawable?.draw(image: CIImage(cvPixelBuffer: buffer.imageBuffer!))
+        if input != nil {
+            mixer?.audioIO.playback.startQueueIfNeed()
+            drawable?.draw(image: CIImage(cvPixelBuffer: buffer.imageBuffer!))
+        }
     }
 }
