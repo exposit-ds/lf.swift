@@ -11,8 +11,8 @@ open class GLLFView: GLKView {
 
     open var videoGravity:String = AVLayerVideoGravityResizeAspect
 
-    var position:AVCaptureDevicePosition = .back
-    var orientation:AVCaptureVideoOrientation = .portrait
+    public var position:AVCaptureDevicePosition = .back
+    public var orientation:AVCaptureVideoOrientation = .portrait
 
     fileprivate var ciContext:CIContext!
     fileprivate var displayImage:CIImage?
@@ -71,10 +71,10 @@ open class GLLFView: GLKView {
 
 extension GLLFView: NetStreamDrawable {
     // MARK: NetStreamDrawable
-    func render(image: CIImage, to toCVPixelBuffer: CVPixelBuffer) {
+    public func render(image: CIImage, to toCVPixelBuffer: CVPixelBuffer) {
         ciContext.render(image, to: toCVPixelBuffer)
     }
-    func draw(image:CIImage) {
+    public func draw(image:CIImage) {
         DispatchQueue.main.async {
             self.displayImage = image
             self.setNeedsDisplay()

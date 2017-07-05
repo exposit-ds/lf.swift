@@ -9,11 +9,11 @@ final class AudioIOComponent: IOComponent {
 #if os(iOS) || os(macOS)
     var input:LFCaptureDeviceInput? = nil {
         didSet {
-            guard let mixer:AVMixer = mixer, oldValue != input else {
+            guard let mixer:AVMixer = mixer, oldValue !== input else {
                 return
             }
             if let oldValue:LFCaptureDeviceInput = oldValue {
-                mixer.session?.removeInput(oldValue)
+                mixer.session.removeInput(oldValue)
             }
             if let input:LFCaptureDeviceInput = input, mixer.session.canAddInput(input) {
                 mixer.session.addInput(input)
@@ -64,11 +64,12 @@ final class AudioIOComponent: IOComponent {
         }
 
         input = try audio.createCaptureDeviceInput()
+        output = audio.createCaptureAudioDataOutput()
         #if os(iOS)
         mixer.session.automaticallyConfiguresApplicationAudioSession = automaticallyConfiguresApplicationAudioSession
         #endif
-        mixer.session.addOutput(output)
-        output.setSampleBufferDelegate(self, queue: lockQueue)
+        mixer.session.addOutput(output!)
+        output!.setSampleBufferDelegate(self, queue: lockQueue)
     }
 
     func dispose() {

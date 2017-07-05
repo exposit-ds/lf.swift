@@ -86,12 +86,14 @@ public protocol LFCaptureDeviceInput: LFCaptureInput {
 }
 
 public protocol LFCaptureSession: class {
+    var automaticallyConfiguresApplicationAudioSession: Bool { get set }
     var sessionPreset: String { get set }
     var isRunning: Bool { get }
     
     func beginConfiguration()
     func commitConfiguration()
     func canAddOutput(_ output: LFCaptureOutput) -> Bool
+    func canAddInput(_ output: LFCaptureInput) -> Bool
     func addOutput(_ output: LFCaptureOutput)
     func addInput(_ input: LFCaptureInput)
     func removeOutput(_ output: LFCaptureOutput)

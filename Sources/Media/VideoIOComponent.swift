@@ -54,7 +54,7 @@ final class VideoIOComponent: IOComponent {
 
     var orientation:AVCaptureVideoOrientation = .portrait {
         didSet {
-            guard orientation != oldValue else {
+            guard orientation != oldValue, let output = output else {
                 return
             }
             for connection in output.connections {
@@ -182,11 +182,11 @@ final class VideoIOComponent: IOComponent {
 
     var input:LFCaptureInput? = nil {
         didSet {
-            guard let mixer:AVMixer = mixer, oldValue != input else {
+            guard let mixer:AVMixer = mixer, oldValue !== input else {
                 return
             }
             if let oldValue:LFCaptureInput = oldValue {
-                mixer.session?.removeInput(oldValue)
+                mixer.session.removeInput(oldValue)
             }
             if let input:LFCaptureInput = input, mixer.session.canAddInput(input) {
                 mixer.session.addInput(input)
@@ -247,8 +247,8 @@ final class VideoIOComponent: IOComponent {
         #endif
 
         input = try camera.createCaptureDeviceInput()
-        mixer.session.addOutput(output)
-        for connection in output.connections {
+        mixer.session.addOutput(output!)
+        for connection in output!.connections {
             guard let connection:AVCaptureConnection = connection as? AVCaptureConnection else {
                 continue
             }
@@ -256,7 +256,7 @@ final class VideoIOComponent: IOComponent {
                 connection.videoOrientation = orientation
             }
         }
-        output.setSampleBufferDelegate(self, queue: lockQueue)
+        output!.setSampleBufferDelegate(self, queue: lockQueue)
 
         fps = fps * 1
         position = camera.position

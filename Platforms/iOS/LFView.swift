@@ -19,7 +19,7 @@ open class LFView: UIView {
         }
     }
 
-    var orientation:AVCaptureVideoOrientation = .portrait {
+    public var orientation:AVCaptureVideoOrientation = .portrait {
         didSet {
             guard let connection:AVCaptureConnection = layer.connection else {
                 return
@@ -29,7 +29,7 @@ open class LFView: UIView {
             }
         }
     }
-    var position:AVCaptureDevicePosition = .front
+    public var position:AVCaptureDevicePosition = .front
 
     private weak var currentStream:NetStream? {
         didSet {
@@ -66,7 +66,7 @@ open class LFView: UIView {
         }
         stream.lockQueue.async {
             stream.mixer.session.beginConfiguration()
-            self.layer.session = stream.mixer.session
+//            self.layer.session = stream.mixer.session
             stream.mixer.videoIO.drawable = self
             self.orientation = stream.mixer.videoIO.orientation
             self.currentStream = stream
@@ -78,8 +78,8 @@ open class LFView: UIView {
 
 extension LFView: NetStreamDrawable {
     // MARK: NetStreamDrawable
-    func draw(image:CIImage) {
+    public func draw(image:CIImage) {
     }
-    func render(image: CIImage, to toCVPixelBuffer: CVPixelBuffer) {
+    public func render(image: CIImage, to toCVPixelBuffer: CVPixelBuffer) {
     }
 }

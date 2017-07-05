@@ -51,7 +51,6 @@ open class NetService: NSObject {
         service = Foundation.NetService(domain: domain, type: type, name: name, port: port)
         service.delegate = self
         service.setTXTRecord(txtData)
-        service.schedule(in: runloop, forMode: RunLoopMode.defaultRunLoopMode)
         if (type.contains("._udp")) {
             service.publish()
         } else {

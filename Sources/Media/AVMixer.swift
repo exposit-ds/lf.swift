@@ -38,9 +38,9 @@ final public class AVMixer: NSObject {
             guard sessionPreset != oldValue else {
                 return
             }
-            session?.beginConfiguration()
-            session?.sessionPreset = sessionPreset
-            session?.commitConfiguration()
+            session.beginConfiguration()
+            session.sessionPreset = sessionPreset
+            session.commitConfiguration()
         }
     }
 
@@ -113,7 +113,7 @@ extension AVMixer {
 extension AVMixer: Runnable {
     // MARK: Runnable
     var running:Bool {
-        return session != nil && session!.isRunning
+        return session.isRunning
     }
 
     final func startRunning() {
@@ -144,21 +144,3 @@ extension AVMixer: Runnable {
     }
 }
 #endif
-
-extension AVMixer: AdditionalOutput {
-    
-    func addOutput(output: AVCaptureOutput!) {
-
-        if session.canAddOutput(output) {
-            session.beginConfiguration()
-            session.addOutput(output)
-            session.commitConfiguration()
-        }
-    }
-    
-    func removeOutput(output: AVCaptureOutput!) {
-        session.beginConfiguration()
-        session.removeOutput(output)
-        session.commitConfiguration()
-    }
-}

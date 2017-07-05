@@ -2,7 +2,7 @@ import CoreImage
 import Foundation
 import AVFoundation
 
-protocol NetStreamDrawable: class {
+public protocol NetStreamDrawable: class {
 #if os(iOS) || os(macOS)
     var orientation:AVCaptureVideoOrientation { get set }
     var position:AVCaptureDevicePosition { get set }

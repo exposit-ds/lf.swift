@@ -6,25 +6,21 @@
 //
 //
 
-import Cocoa
-
 extension AVMixer: AdditionalOutput {
     
     func addOutput(output: LFCaptureOutput!) {
         
-        if session != nil && session!.canAddOutput(output) {
-            session!.beginConfiguration()
-            session!.addOutput(output)
-            session!.commitConfiguration()
+        if session.canAddOutput(output) {
+            session.beginConfiguration()
+            session.addOutput(output)
+            session.commitConfiguration()
         }
     }
     
     func removeOutput(output: LFCaptureOutput!) {
-        if let session = session {
-            session.beginConfiguration()
-            session.removeOutput(output)
-            session.commitConfiguration()
-        }
+        session.beginConfiguration()
+        session.removeOutput(output)
+        session.commitConfiguration()
     }
 }
 
